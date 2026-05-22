@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudBaby 小云朵班级常规养成助手</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true">
+    <span class="float f1">☁️</span>
+    <span class="float f2">⭐</span>
+    <span class="float f3">🌈</span>
+    <span class="float f4">🌸</span>
+    <span class="float f5">☀️</span>
+  </div>
+
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">☁️</div>
+        <div>
+          <h1>CloudBaby 小云朵班级常规养成助手</h1>
+          <p>让小朋友在照顾班级宠物的过程中，主动养成好常规</p>
+        </div>
+      </div>
+
+      <div class="top-stats" aria-label="今日状态和累计成长">
+        <div class="stat-pill"><span>📅</span><strong id="todayLabel">--</strong></div>
+        <div class="stat-pill"><span>😊</span><strong id="healthTop">100</strong></div>
+        <div class="stat-pill"><span>🏅</span><strong id="levelTop">Lv.0</strong></div>
+        <button class="mini-btn" id="voiceToggle" type="button">🔊 语音开</button>
+        <button class="mini-btn" id="aboutBtn" type="button">作品说明</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="panel left-panel">
+        <section class="card">
+          <div class="card-title-row">
+            <h2>一日场景</h2>
+            <span class="hint">先选场景</span>
+          </div>
+          <div class="scene-grid" id="sceneGrid"></div>
+        </section>
+
+        <section class="card target-card">
+          <div class="card-title-row">
+            <h2>选择对象</h2>
+            <button class="plain-btn" id="editKidsBtn" type="button">编辑名单</button>
+          </div>
+
+          <div class="target-class-row">
+            <button class="target-btn target-class" id="classTargetBtn" type="button">🌈 全班</button>
+          </div>
+
+          <h3 class="subhead">小组</h3>
+          <div class="group-grid" id="groupGrid"></div>
+
+          <h3 class="subhead">幼儿</h3>
+          <div class="kid-grid" id="kidGrid"></div>
+        </section>
+      </aside>
+
+      <section class="center-stage panel">
+        <section class="stage-card" id="stageCard">
+          <div class="stage-header">
+            <div>
+              <h2 id="sceneTitle">入园</h2>
+              <p id="sceneGuide">小云朵正在等小朋友问好。</p>
+            </div>
+            <div class="scene-badge" id="sceneBadge">🌅 入园</div>
+          </div>
+
+          <div class="cloud-stage" id="cloudStage">
+            <div class="scene-visual" id="sceneVisual" aria-hidden="true"></div>
+            <div class="cloud-bubble" id="cloudBubble">你好呀，我是小云朵！</div>
+
+            <div class="cloud-wrap" id="cloudWrap" role="button" tabindex="0" aria-label="点击小云朵听它说话">
+              <div class="decor-ring" id="decorRing"></div>
+              <div class="cloud-body" id="cloudBody">
+                <span class="puff puff-a"></span>
+                <span class="puff puff-b"></span>
+                <span class="puff puff-c"></span>
+                <span class="puff puff-d"></span>
+                <span class="puff puff-e"></span>
+                <div class="cloud-face" id="cloudFace">
+                  <div class="eyes">
+                    <span class="eye left-eye"></span>
+                    <span class="eye right-eye"></span>
+                  </div>
+                  <span class="mouth"></span>
+                  <span class="cheek cheek-l"></span>
+                  <span class="cheek cheek-r"></span>
+                </div>
+                <div class="cloud-extra" id="cloudExtra"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="growth-card">
+            <div class="growth-main">
+              <div class="growth-labels">
+                <strong id="growthLevel">Lv.0</strong>
+                <span id="growthText">累计能量 0 / 10</span>
+              </div>
+              <div class="progress-outer" aria-label="累计能量进度">
+                <div class="progress-inner" id="growthBar"></div>
+              </div>
+            </div>
+            <div class="health-main">
+              <span id="healthFace">😊</span>
+              <div>
+                <strong id="healthText">今日健康 100</strong>
+                <p id="healthDesc">白白净净，笑容灿烂</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="action-btn praise" id="praiseBtn" type="button">✅ 表扬</button>
+            <button class="action-btn remind" id="remindBtn" type="button">🌱 温柔提醒</button>
+            <button class="action-btn encourage" id="encourageBtn" type="button">✨ 集体鼓励</button>
+            <button class="action-btn neutral" id="summaryBtn" type="button">📊 离园总结</button>
+          </div>
+        </section>
+
+        <section class="card task-card">
+          <div class="card-title-row">
+            <h2>当前任务</h2>
+            <span id="selectedTargetLabel" class="selected-label">未选择对象</span>
+          </div>
+          <div class="task-chips" id="taskChips"></div>
+        </section>
+      </section>
+
+      <aside class="panel right-panel">
+        <section class="card speech-card">
+          <div class="card-title-row">
+            <h2>AI 情境话术</h2>
+            <span class="ai-tag">本地智能生成</span>
+          </div>
+          <p class="speech-meta" id="speechMeta">当前还没有生成话术</p>
+          <div class="speech-box" id="speechBox">选择场景和对象后，点击“表扬”或“温柔提醒”，小云朵会自动生成适合幼儿的温柔话术。</div>
+          <div class="small-actions">
+            <button class="small-btn" id="rerollBtn" type="button">🔁 换一句</button>
+            <button class="small-btn" id="readSpeechBtn" type="button">🔊 朗读</button>
+            <button class="small-btn" id="copySpeechBtn" type="button">📋 复制</button>
+          </div>
+        </section>
+
+        <section class="card today-card">
+          <div class="card-title-row">
+            <h2>今日数据</h2>
+            <button class="plain-btn" id="dataBtn" type="button">查看全部</button>
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><span id="todayPraise">0</span><em>表扬</em></div>
+            <div class="metric"><span id="todayRemind">0</span><em>提醒</em></div>
+            <div class="metric"><span id="todayEncourage">0</span><em>鼓励</em></div>
+          </div>
+          <h3 class="subhead">今日小明星</h3>
+          <div class="star-list" id="starList"></div>
+        </section>
+
+        <section class="card flower-card">
+          <div class="card-title-row">
+            <h2>小组花瓣</h2>
+            <span class="hint">每日重置</span>
+          </div>
+          <div id="flowerList" class="flower-list"></div>
+        </section>
+
+        <section class="card gallery-card">
+          <div class="card-title-row">
+            <h2>装饰图鉴</h2>
+            <span class="hint">永久保留</span>
+          </div>
+          <div class="decor-gallery" id="decorGallery"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer-actions">
+      <button class="footer-btn" id="mailboxBtn" type="button">📬 表扬信箱</button>
+      <button class="footer-btn" id="resetTodayBtn" type="button">🌙 今日重置</button>
+      <button class="footer-btn danger" id="resetAllBtn" type="button">🧹 全部清空</button>
+    </footer>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="particleLayer" class="particle-layer" aria-hidden="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
