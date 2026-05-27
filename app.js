@@ -979,24 +979,106 @@
     lastSpeechContext = { sceneId, target: { ...target }, actionType };
   }
 
+  function getSoftChineseVoice() {
+    if (!("speechSynthesis" in window)) return null;
+
+    const voices = window.speechSynthesis.getVoices();
+
+    const chineseVoices = voices.filter((voice) => {
+      const lang = (voice.lang || "").toLowerCase();
+      const name = (voice.name || "").toLowerCase();
+      return (
+        lang.includes("zh") ||
+        name.includes("chinese") ||
+        name.includes("mandarin") ||
+        name.includes("putonghua") ||
+        name.includes("普通话") ||
+        name.includes("中文")
+      );
+    });
+
+    if (!chineseVoices.length) return voices[0] || null;
+
+    const softKeywords = [
+      "xiaoxiao",
+      "xiaoyi",
+      "yaoyao",
+      "tingting",
+      "huihui",
+      "hanhan",
+      "meijia",
+      "female",
+      "girl",
+      "woman",
+      "女",
+      "小小",
+      "晓晓",
+      "婷婷",
+      "瑶瑶",
+    ];
+
+    const preferredVoice = chineseVoices.find((voice) => {
+      const name = (voice.name || "").toLowerCase();
+      return softKeywords.some((keyword) =>
+        name.includes(keyword.toLowerCase()),
+      );
+    });
+
+    return preferredVoice || chineseVoices[0];
+  }
+
+  function makeTextSofterForSpeech(text) {
+    return (
+      String(text)
+        // 去掉 emoji，避免浏览器读出“彩虹、星星、对勾”之类的奇怪内容
+        .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "")
+        // 把太强的感叹语气变柔和
+        .replace(/[!！]+/g, "。")
+        .replace(/[~～]+/g, "，")
+        // 增加一点停顿，让它不像连珠炮
+        .replace(/，/g, "， ")
+        .replace(/。/g, "。 ")
+        .replace(/？/g, "？ ")
+        .replace(/：/g, "： ")
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+  }
+
   function speakText(text) {
     if (!state?.settings?.voiceOn) return;
-    if (!text || !('speechSynthesis' in window)) return;
+    if (!text || !("speechSynthesis" in window)) return;
 
     try {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-CN';
+
+      const utterance = new SpeechSynthesisUtterance(
+        makeTextSofterForSpeech(text),
+      );
+
+      utterance.lang = "zh-CN";
+
+      // 温柔版参数：语速慢一点，音调不要太尖，音量稍微收一点
       utterance.rate = 0.88;
-      utterance.pitch = 1.35;
-      utterance.volume = 0.95;
-      const voices = window.speechSynthesis.getVoices();
-      const zhVoice = voices.find((voice) => voice.lang && voice.lang.toLowerCase().includes('zh'));
-      if (zhVoice) utterance.voice = zhVoice;
+      utterance.pitch = 0.7;
+      utterance.volume = 0.88;
+
+      const softVoice = getSoftChineseVoice();
+      if (softVoice) {
+        utterance.voice = softVoice;
+      }
+
       window.speechSynthesis.speak(utterance);
     } catch (error) {
-      console.warn('语音朗读失败：', error);
+      console.warn("语音朗读失败：", error);
     }
+  }
+
+  // 有些浏览器需要等 voices 加载完成，否则第一次可能拿不到语音列表
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
   }
 
   function addEnergy(amount) {
